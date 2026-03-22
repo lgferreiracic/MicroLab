@@ -6,6 +6,7 @@ import PerfilView from '../pages/PerfilView.vue'
 import MyOrdersView from '../pages/MyOrdersView.vue'
 import ProductDetail from '../pages/ProductDetail.vue'
 import FavoriteView from '../pages/FavoriteView.vue'
+import SearchView from '../pages/SearchView.vue'
 import SignInView from '../pages/SignInView.vue'
 import SignUpView from '../pages/SignUpView.vue'
 import { getCurrentSession } from '../services/auth.service'
@@ -58,6 +59,11 @@ const router = createRouter({
 			name: 'favorites',
 			component: FavoriteView,
 			meta: { requiresAuth: true }
+		},
+		{
+			path: '/busca',
+			name: 'search',
+			component: SearchView
 		},
 		{
 			path: '/produto/:id',

@@ -198,25 +198,15 @@
         <p class="m-0 text-sm font-medium text-slate-700">Categorias</p>
 
         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          <div class="rounded-md border border-slate-200 px-3 py-2">
-            <p class="m-0 text-sm font-semibold text-brand-primary">Arduino</p>
-          </div>
-
-          <div class="rounded-md border border-slate-200 px-3 py-2">
-            <p class="m-0 text-sm font-semibold text-brand-primary">Raspberry</p>
-          </div>
-
-          <div class="rounded-md border border-slate-200 px-3 py-2">
-            <p class="m-0 text-sm font-semibold text-brand-primary">IoT</p>
-          </div>
-
-          <div class="rounded-md border border-slate-200 px-3 py-2">
-            <p class="m-0 text-sm font-semibold text-brand-primary">Sensores</p>
-          </div>
-
-          <div class="rounded-md border border-slate-200 px-3 py-2">
-            <p class="m-0 text-sm font-semibold text-brand-primary">Impressoras 3D</p>
-          </div>
+          <button
+            v-for="category in categories"
+            :key="category"
+            type="button"
+            class="rounded-md border border-slate-200 px-3 py-2 text-left transition hover:bg-slate-50"
+            @click="handleCategorySearch(category)"
+          >
+            <p class="m-0 text-sm font-semibold text-brand-primary">{{ category }}</p>
+          </button>
         </div>
       </div>
     </div>
@@ -235,6 +225,7 @@ import Popover from 'primevue/popover'
 import InputMask from 'primevue/inputmask'
 import { supabase } from '../../lib/supabase'
 import { getCurrentAuthUser } from '../../services/auth.service'
+import { useDeliveryStore } from '../../stores/delivery.store'
 import logoPng from '../../assets/logo.png'
 
 export default defineComponent({
@@ -263,19 +254,47 @@ export default defineComponent({
     return {
       searchTerm: '',
       logoSrc: logoPng,
-      deliveryZip: '00000-000',
-      deliveryCity: 'Carregando cidade...',
-      editableZip: '00000-000',
       isUpdatingZip: false,
       isCategoriesOpen: false,
       isCompact: false,
+      categories: ['Arduino', 'Raspberry', 'IoT', 'Sensores', 'Impressoras 3D'],
       userFirstName: '',
       authSubscription: null as { unsubscribe: () => void } | null
+    }
+  },
+  setup() {
+    const deliveryStore = useDeliveryStore()
+    return {
+      deliveryStore
     }
   },
   computed: {
     loginButtonLabel(): string {
       return this.userFirstName || 'Entrar'
+    },
+    deliveryZip: {
+      get(): string {
+        return this.deliveryStore.deliveryZip
+      },
+      set(value: string): void {
+        this.deliveryStore.setDelivery(value, this.deliveryStore.deliveryCity)
+      }
+    },
+    deliveryCity: {
+      get(): string {
+        return this.deliveryStore.deliveryCity
+      },
+      set(value: string): void {
+        this.deliveryStore.setCity(value)
+      }
+    },
+    editableZip: {
+      get(): string {
+        return this.deliveryStore.editableZip
+      },
+      set(value: string): void {
+        this.deliveryStore.setEditableZip(value)
+      }
     }
   },
   mounted() {
@@ -297,6 +316,12 @@ export default defineComponent({
   methods: {
     handleSearch(): void {
       this.$emit('search', this.searchTerm)
+
+      const trimmedSearch = this.searchTerm.trim()
+      void this.$router.push({
+        name: 'search',
+        query: trimmedSearch ? { q: trimmedSearch } : {}
+      })
     },
     handleFavorites(): void {
       this.$emit('favorites')
@@ -367,6 +392,13 @@ export default defineComponent({
     toggleCategoriesPopover(): void {
       this.isCategoriesOpen = !this.isCategoriesOpen
     },
+    handleCategorySearch(category: string): void {
+      this.isCategoriesOpen = false
+      void this.$router.push({
+        name: 'search',
+        query: { category }
+      })
+    },
     async applyZip(): Promise<void> {
       const normalizedZip = this.editableZip.replace(/\D/g, '')
       if (normalizedZip.length !== 8) {
@@ -392,8 +424,9 @@ export default defineComponent({
           throw new Error('CEP invalido')
         }
 
-        this.deliveryZip = data.cep || this.editableZip
-        this.deliveryCity = [data.localidade, data.uf].filter(Boolean).join(' - ') || this.deliveryCity
+        const nextZip = data.cep || this.editableZip
+        const nextCity = [data.localidade, data.uf].filter(Boolean).join(' - ') || this.deliveryCity
+        this.deliveryStore.setDelivery(nextZip, nextCity)
       } catch {
         // Mantem os valores atuais se a consulta falhar.
       } finally {
@@ -401,6 +434,13 @@ export default defineComponent({
       }
     },
     async loadInitialCity(): Promise<void> {
+      const hasSavedZip = this.deliveryStore.deliveryZip !== '00000-000'
+      const hasSavedCity = this.deliveryStore.deliveryCity !== 'Carregando cidade...'
+
+      if (hasSavedZip || hasSavedCity) {
+        return
+      }
+
       try {
         const response = await fetch('https://ipapi.co/json/')
         if (!response.ok) {
@@ -415,14 +455,14 @@ export default defineComponent({
         const city = data.city?.trim()
         const state = data.region_code?.trim()
         if (city) {
-          this.deliveryCity = state ? `${city} - ${state}` : city
+          this.deliveryStore.setCity(state ? `${city} - ${state}` : city)
           return
         }
       } catch {
         // Fallback padrao abaixo.
       }
 
-      this.deliveryCity = 'Sao Paulo - SP'
+      this.deliveryStore.setCity('Sao Paulo - SP')
     }
   }
 })
