@@ -13,6 +13,8 @@
 			@cart="onCart"
 		/>
 		<AppBanner />
+		<ProductSection />
+		<AppFooter />
 	</div>
 </template>
 
@@ -21,26 +23,30 @@ import { defineComponent } from 'vue'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppBanner from '../components/layout/AppBanner.vue'
+import AppFooter from '../components/layout/AppFooter.vue'
+import ProductSection from '../components/product/ProductSection.vue'
 
 export default defineComponent({
 	name: 'HomeView',
 	components: {
 		AppHeader,
 		AppNavbar,
-		AppBanner
+		AppBanner,
+		AppFooter,
+		ProductSection
 	},
 	methods: {
 		onSearch(searchTerm: string): void {
 			console.log('search', searchTerm)
 		},
 		onFavorites(): void {
-			console.log('favorites')
+			this.$router.push({ name: 'perfil', query: { tab: 'favorites' } })
 		},
 		onLogin(): void {
-			console.log('login')
+			this.$router.push({ name: 'perfil' })
 		},
 		onCart(): void {
-			console.log('cart')
+			this.$router.push({ name: 'cart' })
 		}
 	}
 })

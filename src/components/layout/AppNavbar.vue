@@ -3,9 +3,11 @@
     <nav class="border-b border-brand-tertiary/40 bg-brand-primary text-white">
       <div class="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 md:h-28 md:flex-row md:gap-0 md:px-10 md:py-0 lg:px-12">
         <div class="flex h-12 w-full items-center justify-center border-b border-white/20 pb-2 md:h-full md:w-1/5 md:border-b-0 md:border-r md:px-2 md:pb-0">
-          <slot name="logo">
-            <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
-          </slot>
+          <RouterLink :to="{ name: 'home' }" aria-label="Ir para home" class="inline-flex items-center justify-center">
+            <slot name="logo">
+              <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
+            </slot>
+          </RouterLink>
         </div>
 
         <div class="flex w-full items-start justify-center md:h-full md:w-[55%] md:px-4 md:pt-2">
@@ -118,7 +120,29 @@
 
     <div v-if="isCategoriesOpen" class="absolute inset-x-0 top-full z-50 mt-2 px-6 sm:px-10 lg:px-12">
       <div class="mx-auto w-full max-w-7xl rounded-md border border-brand-tertiary/30 bg-white p-4 shadow-lg">
-        <p class="m-0 text-sm text-slate-700">Menu de categorias (em construcao)</p>
+        <p class="m-0 text-sm font-medium text-slate-700">Categorias</p>
+
+        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div class="rounded-md border border-slate-200 px-3 py-2">
+            <p class="m-0 text-sm font-semibold text-brand-primary">Arduino</p>
+          </div>
+
+          <div class="rounded-md border border-slate-200 px-3 py-2">
+            <p class="m-0 text-sm font-semibold text-brand-primary">Raspberry</p>
+          </div>
+
+          <div class="rounded-md border border-slate-200 px-3 py-2">
+            <p class="m-0 text-sm font-semibold text-brand-primary">IoT</p>
+          </div>
+
+          <div class="rounded-md border border-slate-200 px-3 py-2">
+            <p class="m-0 text-sm font-semibold text-brand-primary">Sensores</p>
+          </div>
+
+          <div class="rounded-md border border-slate-200 px-3 py-2">
+            <p class="m-0 text-sm font-semibold text-brand-primary">Impressoras 3D</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -126,6 +150,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { RouterLink } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -137,6 +162,7 @@ import logoPng from '../../assets/logo.png'
 export default defineComponent({
   name: 'AppNavbar',
   components: {
+    RouterLink,
     Button,
     InputText,
     IconField,

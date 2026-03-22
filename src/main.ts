@@ -3,6 +3,7 @@ import PrimeVue from 'primevue/config'
 import ConfirmationService from 'primevue/confirmationservice'
 import Aura from '@primeuix/themes/aura'
 import App from './App.vue'
+import router from './router'
 import './style.css'
 import 'primeicons/primeicons.css'
 
@@ -18,5 +19,6 @@ app.use(PrimeVue, {
 })
 
 app.use(ConfirmationService)
+app.use(router)
 
 app.mount('#app')
