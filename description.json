@@ -1,0 +1,41 @@
+{
+    "banner": "https://drive.google.com/file/d/1mPVWd-4UH-FvAUBMBqSCMmbRRxZ8Ckln/view?usp=sharing",
+    "text": {
+      "phrase": "O Futuro da prototipagem eletrônica",
+      "introduction": "O Arduino Uno R4 WiFi vai além das expectativas ao trazer uma série de inovações para a prototipagem eletrônica. Com WiFi integrado, você pode conectar seus projetos à rede sem fio com facilidade, abrindo um mundo de possibilidades para a criação de dispositivos inteligentes. Além disso, a placa apresenta outras melhorias significativas, como retrocompatibilidade com a Uno R3, matriz de LED incorporada, pino ON/OFF remoto e ampliação da tensão de alimentação. Prepare-se para o futuro da prototipagem eletrônica e explore todo o potencial da conectividade WiFi com o Arduino Uno R4 WiFi.",
+      "extra": {
+        "Capacidade de processamento aprimorada e retrocompatibilidade": "A Uno R4 WiFi traz melhorias significativas para seus projetos. Equipada com o microcontrolador Renesas RA4M1 com Arm Cortex®-M4 de 32 bits, a placa oferece maior capacidade de processamento e suporte a periféricos. E tem mais, a R4 é retrocompatível com outras placas da família UNO, mantendo o mesmo tamanho, posição e tensão de operação (5V), garantindo a compatibilidade com projetos anteriores em termos de pinagem. Ao mesmo tempo, é importante considerar que nem todos os códigos anteriores serão compatíveis com a nova placa, em especial os que fazem manipulação de registradores não são compatíveis.",
+        "Conectividade sem fio e recursos adicionais": "Com WiFi e Bluetooth integrados, graças ao módulo Espressif ESP32-S3, a Uno R4 permite a conexão fácil a redes sem fio e dispositivos compatíveis. A placa também apresenta uma matriz de LED 12×8 incorporada, que possibilita a exibição direta de caracteres e sinais. Além disso, o pino OFF permite ligar e desligar a placa remotamente, sem interromper a alimentação."
+        }
+    },
+    "specifications": {
+        "Microcontrolador": "RA4M1",
+        "Velocidade do Clock": "48 MHz",
+        "Pinos I/O Digitais": "20 (6 podem ser usadas como PWM)",
+        "Portas Analógicas": "6",
+        "DAC": "1",
+        "Conectividade": "WiFi e Bluetooth (ESP32-S3)",
+        "Tensão de Operação": "5 V",
+        "Tensão de Alimentação": "6-24 V",
+        "Corrente Máxima Pinos I/O": "8 mA",
+        "Memória Flash": "256 KB",
+        "SRAM": "32 KB",
+        "Dimensões": "53,34 x 68,85 mm"
+    },
+    "documentation": {
+      "Datasheet da Uno R4": "https://www.makerhero.com/wp-content/uploads/2023/06/ABX00087-datasheet.pdf",
+      "Datasheet do RA4M1": "https://www.renesas.com/us/en/document/dst/renesas-ra4m1-group-datasheet?r=1054146",
+      "Download da Arduino IDE": "https://www.arduino.cc/en/software"
+    },
+    "comes-with": {
+      "01": "Arduino Uno R4 WiFi"
+    },
+    "pinout": {
+      "introduction": "O Arduino Uno R4 WiFi tem 20 pinos de entrada/saída digital (dos quais 6 podem ser usados ​​como saídas PWM e 6 como entradas analógicas), um cristal oscilador de 16 MHz, uma conexão USB, um conector de alimentação, um conector ICSP e um botão de reset. São múltiplas opções de criação e expansão. Para maiores detalhes confira o datasheet da Uno R4 WiFi.",
+      "img": "https://drive.google.com/file/d/14rHKTxyhm58BUOzXUlEmjFOj6QVGMABT/view?usp=sharing"
+    },
+    "video": {
+      "introduction": "Conheça um pouco mais sobre a plataforma de prototipagem eletrônica open-hardware mais utilizada pela comunidade maker. Ela possui seu próprio ambiente de desenvolvimento open-software baseado na linguagem C, com programação bastante intuitiva para iniciantes.",
+      "link": "https://www.youtube.com/watch?v=WmSJ3IbhnfI&t=2s"
+    }
+  }

@@ -3,7 +3,7 @@
 		<img
 			:src="product.image"
 			:alt="`${product.name} card`"
-			class="h-40 w-full rounded-md object-cover"
+			class="h-52 w-full rounded-md bg-white object-contain p-2"
 		/>
 
 		<div class="mt-3 min-w-0 text-center">

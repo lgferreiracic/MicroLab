@@ -1,5 +1,17 @@
 <template>
   <section class="mx-auto w-full max-w-440 px-4 py-8 sm:px-6 lg:px-12">
+    <div v-if="isLoading" class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+      Carregando produtos...
+    </div>
+
+    <div v-else-if="errorMessage" class="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+      {{ errorMessage }}
+    </div>
+
+    <div v-else-if="!sections.length" class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+      Nenhum produto encontrado.
+    </div>
+
     <div class="mt-5 space-y-8">
       <div
         v-for="section in sections"
@@ -56,9 +68,23 @@ import { defineComponent } from 'vue'
 import Carousel from 'primevue/carousel'
 import ProductCard from './ProductCard.vue'
 import arduinoProduct from '../../assets/products/arduino.png'
-import iotProduct from '../../assets/products/iot.png'
 import raspberryProduct from '../../assets/products/raspberry.png'
-import sensorsProduct from '../../assets/products/sensors.png'
+import { getCatalogProducts, type ProductCatalogItem } from '../../services/product.service'
+
+type ProductCardItem = {
+  id: number
+  name: string
+  image: string
+  price: number
+  installments: number
+}
+
+type ProductSectionItem = {
+  id: string
+  title: string
+  image: string
+  products: ProductCardItem[]
+}
 
 export default defineComponent({
   name: 'ProductSection',
@@ -68,52 +94,114 @@ export default defineComponent({
   },
   data() {
     return {
-      sections: [
-        {
-          id: 'arduino',
-          title: 'Arduino',
-          image: arduinoProduct,
-          products: [
-            { id: 101, name: 'Arduino Uno R3', image: arduinoProduct, price: 189.9, installments: 10 },
-            { id: 102, name: 'Arduino Nano', image: arduinoProduct, price: 149.9, installments: 8 },
-            { id: 103, name: 'Arduino Mega', image: arduinoProduct, price: 229.9, installments: 10 },
-            { id: 104, name: 'Arduino Starter Kit', image: arduinoProduct, price: 299.9, installments: 12 }
-          ]
-        },
-        {
-          id: 'raspberry',
-          title: 'Raspberry',
-          image: raspberryProduct,
-          products: [
-            { id: 201, name: 'Raspberry Pi 4 4GB', image: raspberryProduct, price: 699.9, installments: 12 },
-            { id: 202, name: 'Raspberry Pi 4 8GB', image: raspberryProduct, price: 899.9, installments: 12 },
-            { id: 203, name: 'Raspberry Pi Zero 2 W', image: raspberryProduct, price: 289.9, installments: 10 },
-            { id: 204, name: 'Raspberry Pi Pico W', image: raspberryProduct, price: 89.9, installments: 6 }
-          ]
-        },
-        {
-          id: 'iot',
-          title: 'IoT',
-          image: iotProduct,
-          products: [
-            { id: 301, name: 'Kit IoT ESP32', image: iotProduct, price: 359.9, installments: 12 },
-            { id: 302, name: 'Kit Wi-Fi ESP8266', image: iotProduct, price: 249.9, installments: 10 },
-            { id: 303, name: 'Gateway LoRa', image: iotProduct, price: 489.9, installments: 12 },
-            { id: 304, name: 'Modulo NB-IoT', image: iotProduct, price: 319.9, installments: 10 }
-          ]
-        },
-        {
-          id: 'sensors',
-          title: 'Sensores',
-          image: sensorsProduct,
-          products: [
-            { id: 401, name: 'Sensor DHT22', image: sensorsProduct, price: 49.9, installments: 4 },
-            { id: 402, name: 'Sensor PIR', image: sensorsProduct, price: 39.9, installments: 4 },
-            { id: 403, name: 'Sensor Ultrassonico HC-SR04', image: sensorsProduct, price: 34.9, installments: 4 },
-            { id: 404, name: 'Sensor de Gas MQ-2', image: sensorsProduct, price: 44.9, installments: 4 }
-          ]
+      sections: [] as ProductSectionItem[],
+      isLoading: true,
+      errorMessage: ''
+    }
+  },
+  async created() {
+    await this.loadSections()
+  },
+  methods: {
+    async loadSections(): Promise<void> {
+      this.isLoading = true
+      this.errorMessage = ''
+
+      try {
+        const products = await getCatalogProducts()
+        this.sections = this.groupByCategory(products)
+      } catch (error) {
+        this.sections = []
+        this.errorMessage = error instanceof Error ? error.message : 'Nao foi possivel carregar os produtos.'
+      } finally {
+        this.isLoading = false
+      }
+    },
+    groupByCategory(products: ProductCatalogItem[]): ProductSectionItem[] {
+      const grouped = new Map<string, ProductSectionItem>()
+
+      products.forEach((product) => {
+        const sectionKey = `${product.category_id}-${product.category_name}`
+        const sectionId = this.slugify(product.category_name)
+        const image = this.resolveProductImage(product)
+
+        if (!grouped.has(sectionKey)) {
+          grouped.set(sectionKey, {
+            id: sectionId,
+            title: product.category_name,
+            image: this.resolveCategoryCover(product.category_name, image),
+            products: []
+          })
         }
-      ]
+
+        grouped.get(sectionKey)?.products.push({
+          id: product.product_id,
+          name: product.name,
+          image,
+          price: product.price,
+          installments: this.calculateInstallments(product.price)
+        })
+      })
+
+      return Array.from(grouped.values())
+    },
+    resolveProductImage(product: ProductCatalogItem): string {
+      const description = this.toRecord(product.description)
+      const img = this.toRecord(product.img)
+      const descBanner = this.toText(description?.banner)
+      const imgBanner = this.toText(img?.banner)
+
+      if (imgBanner) {
+        return imgBanner
+      }
+
+      if (descBanner) {
+        return descBanner
+      }
+
+      return this.resolveCategoryCover(product.category_name)
+    },
+    resolveCategoryCover(categoryName: string, fallback = ''): string {
+      const normalized = categoryName.toLowerCase()
+
+      if (normalized.includes('arduino')) {
+        return arduinoProduct
+      }
+
+      if (normalized.includes('raspberry')) {
+        return raspberryProduct
+      }
+
+      return fallback || arduinoProduct
+    },
+    calculateInstallments(price: number): number {
+      if (price >= 500) {
+        return 12
+      }
+
+      if (price >= 250) {
+        return 10
+      }
+
+      return 6
+    },
+    slugify(value: string): string {
+      return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
+    },
+    toRecord(value: unknown): Record<string, unknown> | null {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return null
+      }
+
+      return value as Record<string, unknown>
+    },
+    toText(value: unknown): string {
+      return typeof value === 'string' ? value : ''
     }
   }
 })
