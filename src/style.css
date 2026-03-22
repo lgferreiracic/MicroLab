@@ -1,3 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap');
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @import "tailwindcss";
+
+@theme {
+	--color-brand-primary: #1867fa;
+	--color-brand-secondary: #5a5ffa;
+	--color-brand-tertiary: #5a92fa;
+
+	--font-sans: 'Readex Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+	html,
+	body,
+	#app {
+		min-height: 100%;
+	}
+
+	body {
+		font-family: var(--font-sans);
+	}
+}
