@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "esnext",
+
+    "lib": ["esnext", "dom"],
+    "jsx": "preserve",
+    
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
