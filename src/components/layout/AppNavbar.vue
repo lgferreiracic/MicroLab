@@ -8,7 +8,7 @@
         <div class="flex items-center justify-center">
           <RouterLink :to="{ name: 'home' }" aria-label="Ir para home" class="inline-flex items-center justify-center">
             <slot name="logo">
-              <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
+              <img :src="logoSrc" :alt="logoText" class="h-20 w-auto object-contain" />
             </slot>
           </RouterLink>
         </div>
@@ -78,7 +78,7 @@
         <div class="flex h-12 w-full items-center justify-center border-b border-white/20 pb-2 md:h-full md:w-1/5 md:border-b-0 md:border-r md:px-2 md:pb-0">
           <RouterLink :to="{ name: 'home' }" aria-label="Ir para home" class="inline-flex items-center justify-center">
             <slot name="logo">
-              <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
+              <img :src="logoSrc" :alt="logoText" class="h-40 w-auto object-contain" />
             </slot>
           </RouterLink>
         </div>

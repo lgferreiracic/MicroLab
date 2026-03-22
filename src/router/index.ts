@@ -7,6 +7,7 @@ import MyOrdersView from '../pages/MyOrdersView.vue'
 import ProductDetail from '../pages/ProductDetail.vue'
 import FavoriteView from '../pages/FavoriteView.vue'
 import SearchView from '../pages/SearchView.vue'
+import AdminView from '../pages/AdminView.vue'
 import SignInView from '../pages/SignInView.vue'
 import SignUpView from '../pages/SignUpView.vue'
 import { getCurrentSession } from '../services/auth.service'
@@ -64,6 +65,12 @@ const router = createRouter({
 			path: '/busca',
 			name: 'search',
 			component: SearchView
+		},
+		{
+			path: '/admin',
+			name: 'admin',
+			component: AdminView,
+			meta: { requiresAuth: true }
 		},
 		{
 			path: '/produto/:id',

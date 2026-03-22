@@ -11,6 +11,13 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <RouterLink
+          v-if="isAdminUser"
+          :to="{ name: 'admin' }"
+          class="inline-flex items-center rounded-md border border-white/30 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10"
+        >
+          Painel Admin
+        </RouterLink>
         <slot name="actions" />
       </div>
     </div>
@@ -19,9 +26,15 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { RouterLink } from 'vue-router'
+import { supabase } from '../../lib/supabase'
+import { getCurrentAuthUser } from '../../services/auth.service'
 
 export default defineComponent({
   name: 'AppHeader',
+  components: {
+    RouterLink
+  },
   props: {
     title: {
       type: String,
@@ -30,6 +43,55 @@ export default defineComponent({
     subtitle: {
       type: String,
       default: ''
+    }
+  },
+  data() {
+    return {
+      isAdminUser: false,
+      authSubscription: null as { unsubscribe: () => void } | null
+    }
+  },
+  mounted() {
+    void this.loadAdminStatus()
+
+    const authListener = supabase.auth.onAuthStateChange(() => {
+      void this.loadAdminStatus()
+    })
+    this.authSubscription = authListener.data.subscription
+  },
+  beforeUnmount() {
+    this.authSubscription?.unsubscribe()
+    this.authSubscription = null
+  },
+  methods: {
+    async loadAdminStatus(): Promise<void> {
+      this.isAdminUser = false
+
+      const authUser = await getCurrentAuthUser()
+      if (!authUser) {
+        return
+      }
+
+      const byAuthUid = await supabase
+        .from('users')
+        .select('role:role_id(name)')
+        .eq('auth_uid', authUser.id)
+        .maybeSingle()
+
+      let roleData = byAuthUid.data?.role as any
+
+      if (!roleData && authUser.email) {
+        const byEmail = await supabase
+          .from('users')
+          .select('role:role_id(name)')
+          .eq('email', authUser.email)
+          .maybeSingle()
+
+        roleData = byEmail.data?.role as any
+      }
+
+      const role = Array.isArray(roleData) ? roleData[0] : roleData
+      this.isAdminUser = String(role?.name || '').toUpperCase() === 'ADMIN'
     }
   }
 })
