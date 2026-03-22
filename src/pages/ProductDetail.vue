@@ -61,9 +61,10 @@
 									</div>
 								</div>
 
-								<p v-if="cartMessage" class="m-0 mt-3 text-sm text-brand-primary">{{ cartMessage }}</p>
+								<p v-if="cartMessage" class="m-0 mt-3 text-center text-sm font-medium text-brand-primary">{{ cartMessage }}</p>
+								<p v-if="favoriteMessage" class="m-0 mt-2 text-center text-sm font-medium text-brand-primary">{{ favoriteMessage }}</p>
 
-								<div class="mt-4 flex justify-center">
+								<div class="mt-4 flex flex-wrap justify-center gap-2">
 									<button
 										type="button"
 										:disabled="isAddingToCart"
@@ -71,6 +72,14 @@
 										@click="addToCart"
 									>
 										{{ isAddingToCart ? 'Adicionando...' : 'Adicionar ao carrinho' }}
+									</button>
+									<button
+										type="button"
+										:disabled="isAddingToFavorites"
+										class="inline-flex h-11 w-fit items-center rounded-lg border border-brand-primary bg-white px-6 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary/10 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-900"
+										@click="addToFavorites"
+									>
+										{{ isAddingToFavorites ? 'Salvando...' : 'Adicionar aos favoritos' }}
 									</button>
 								</div>
 							</div>
@@ -178,6 +187,7 @@ import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
 import { supabase } from '../lib/supabase'
 import { getCurrentSession } from '../services/auth.service'
+import { addFavoriteItem } from '../services/favorite.service'
 import { getProductById } from '../services/product.service'
 
 type StringEntry = {
@@ -218,7 +228,9 @@ export default defineComponent({
 			isLoading: true,
 			errorMessage: '',
 			isAddingToCart: false,
-			cartMessage: ''
+			cartMessage: '',
+			isAddingToFavorites: false,
+			favoriteMessage: ''
 		}
 	},
 	computed: {
@@ -392,6 +404,7 @@ export default defineComponent({
 			this.isLoading = true
 			this.errorMessage = ''
 			this.cartMessage = ''
+			this.favoriteMessage = ''
 
 			const rawId = this.id ?? this.$route.params.id
 			const parsedId = Number(rawId)
@@ -517,17 +530,46 @@ export default defineComponent({
 				this.isAddingToCart = false
 			}
 		},
+		async addToFavorites(): Promise<void> {
+			if (!this.product) {
+				this.favoriteMessage = 'Produto invalido para favoritar.'
+				return
+			}
+
+			this.isAddingToFavorites = true
+			this.favoriteMessage = ''
+
+			try {
+				const session = await getCurrentSession()
+				if (!session?.user?.email) {
+					await this.$router.push({ name: 'sign-in', query: { redirect: this.$route.fullPath } })
+					return
+				}
+
+				const appUserId = await this.resolveAppUserId(session.user.id, session.user.email)
+				if (!appUserId) {
+					throw new Error('Nao foi possivel identificar o usuario para favoritos.')
+				}
+
+				await addFavoriteItem(appUserId, this.product.product_id)
+				this.favoriteMessage = 'Produto adicionado aos favoritos.'
+			} catch (error) {
+				this.favoriteMessage = error instanceof Error ? error.message : 'Nao foi possivel adicionar aos favoritos.'
+			} finally {
+				this.isAddingToFavorites = false
+			}
+		},
 		onSearch(searchTerm: string): void {
 			console.log('search', searchTerm)
 		},
 		async onFavorites(): Promise<void> {
 			const session = await getCurrentSession()
 			if (!session) {
-				await this.$router.push({ name: 'sign-in', query: { redirect: '/perfil?tab=favorites' } })
+				await this.$router.push({ name: 'sign-in', query: { redirect: '/favoritos' } })
 				return
 			}
 
-			await this.$router.push({ name: 'perfil', query: { tab: 'favorites' } })
+			await this.$router.push({ name: 'favorites' })
 		},
 		async onLogin(): Promise<void> {
 			const session = await getCurrentSession()

@@ -10,6 +10,45 @@ export type CartItemWithProduct = {
 	product_price: number
 }
 
+type JsonRecord = Record<string, unknown>
+
+function toRecord(value: unknown): JsonRecord | null {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		return null
+	}
+
+	return value as JsonRecord
+}
+
+function toText(value: unknown): string {
+	return typeof value === 'string' ? value : ''
+}
+
+function resolveProductImage(product: { img?: unknown; description?: unknown } | null | undefined): string | null {
+	const img = toRecord(product?.img)
+	const description = toRecord(product?.description)
+
+	const imgBanner = toText(img?.banner)
+	if (imgBanner) {
+		return imgBanner
+	}
+
+	const gallery = img?.gallery
+	if (Array.isArray(gallery) && gallery.length > 0) {
+		const firstGallery = toText(gallery[0])
+		if (firstGallery) {
+			return firstGallery
+		}
+	}
+
+	const descriptionBanner = toText(description?.banner)
+	if (descriptionBanner) {
+		return descriptionBanner
+	}
+
+	return null
+}
+
 /**
  * Get user's cart ID from database
  */
@@ -46,9 +85,10 @@ export async function getCartItems(userId: number): Promise<CartItemWithProduct[
 			product_id,
 			quantity,
 			product:product_id (
-				product_name,
-				product_image,
-				product_price
+				name,
+				price,
+				img,
+				description
 			)
 		`
 		)
@@ -64,9 +104,9 @@ export async function getCartItems(userId: number): Promise<CartItemWithProduct[
 		cart_id: item.cart_id,
 		product_id: item.product_id,
 		quantity: item.quantity,
-		product_name: item.product?.product_name || 'Produto desconhecido',
-		product_image: item.product?.product_image || null,
-		product_price: item.product?.product_price || 0
+		product_name: item.product?.name || 'Produto desconhecido',
+		product_image: resolveProductImage(item.product),
+		product_price: item.product?.price || 0
 	}))
 }
 

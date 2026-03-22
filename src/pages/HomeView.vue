@@ -43,11 +43,11 @@ export default defineComponent({
 		async onFavorites(): Promise<void> {
 			const session = await getCurrentSession()
 			if (!session) {
-				this.$router.push({ name: 'sign-in', query: { redirect: '/perfil?tab=favorites' } })
+				this.$router.push({ name: 'sign-in', query: { redirect: '/favoritos' } })
 				return
 			}
 
-			this.$router.push({ name: 'perfil', query: { tab: 'favorites' } })
+			this.$router.push({ name: 'favorites' })
 		},
 		async onLogin(): Promise<void> {
 			const session = await getCurrentSession()

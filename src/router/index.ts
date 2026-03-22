@@ -5,6 +5,7 @@ import CheckOut from '../pages/CheckOut.vue'
 import PerfilView from '../pages/PerfilView.vue'
 import MyOrdersView from '../pages/MyOrdersView.vue'
 import ProductDetail from '../pages/ProductDetail.vue'
+import FavoriteView from '../pages/FavoriteView.vue'
 import SignInView from '../pages/SignInView.vue'
 import SignUpView from '../pages/SignUpView.vue'
 import { getCurrentSession } from '../services/auth.service'
@@ -49,6 +50,12 @@ const router = createRouter({
 			path: '/meus-pedidos',
 			name: 'my-orders',
 			component: MyOrdersView,
+			meta: { requiresAuth: true }
+		},
+		{
+			path: '/favoritos',
+			name: 'favorites',
+			component: FavoriteView,
 			meta: { requiresAuth: true }
 		},
 		{
