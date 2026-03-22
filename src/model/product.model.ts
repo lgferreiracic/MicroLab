@@ -1,4 +1,3 @@
-import type { CartItem } from './cart-item.model'
 import type { Category } from './category.model'
 
 export type JsonPrimitive = string | number | boolean | null
@@ -18,8 +17,15 @@ export interface Product {
 	category_id: number
 	category?: Category
 	order_items?: ProductOrderItemRef[]
-	cart_items?: CartItem[]
+	cart_items?: ProductCartItemRef[]
 	favorites?: ProductFavoriteRef[]
+}
+
+export type ProductCartItemRef = {
+	cart_item_id: number
+	cart_id: number
+	product_id: number
+	quantity: number
 }
 
 export type ProductOrderItemRef = {

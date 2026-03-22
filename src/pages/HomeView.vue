@@ -25,7 +25,7 @@ import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppBanner from '../components/layout/AppBanner.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
 import ProductSection from '../components/product/ProductSection.vue'
-import { isAuthenticated } from '../lib/auth'
+import { getCurrentSession } from '../services/auth.service'
 
 export default defineComponent({
 	name: 'HomeView',
@@ -40,24 +40,27 @@ export default defineComponent({
 		onSearch(searchTerm: string): void {
 			console.log('search', searchTerm)
 		},
-		onFavorites(): void {
-			if (!isAuthenticated()) {
+		async onFavorites(): Promise<void> {
+			const session = await getCurrentSession()
+			if (!session) {
 				this.$router.push({ name: 'sign-in', query: { redirect: '/perfil?tab=favorites' } })
 				return
 			}
 
 			this.$router.push({ name: 'perfil', query: { tab: 'favorites' } })
 		},
-		onLogin(): void {
-			if (isAuthenticated()) {
+		async onLogin(): Promise<void> {
+			const session = await getCurrentSession()
+			if (session) {
 				this.$router.push({ name: 'perfil' })
 				return
 			}
 
 			this.$router.push({ name: 'sign-in' })
 		},
-		onCart(): void {
-			if (!isAuthenticated()) {
+		async onCart(): Promise<void> {
+			const session = await getCurrentSession()
+			if (!session) {
 				this.$router.push({ name: 'sign-in', query: { redirect: '/cart' } })
 				return
 			}

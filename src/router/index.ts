@@ -3,10 +3,11 @@ import HomeView from '../pages/HomeView.vue'
 import CartView from '../pages/CartView.vue'
 import CheckOut from '../pages/CheckOut.vue'
 import PerfilView from '../pages/PerfilView.vue'
+import MyOrdersView from '../pages/MyOrdersView.vue'
 import ProductDetail from '../pages/ProductDetail.vue'
 import SignInView from '../pages/SignInView.vue'
 import SignUpView from '../pages/SignUpView.vue'
-import { isAuthenticated } from '../lib/auth'
+import { getCurrentSession } from '../services/auth.service'
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -45,6 +46,12 @@ const router = createRouter({
 			meta: { requiresAuth: true }
 		},
 		{
+			path: '/meus-pedidos',
+			name: 'my-orders',
+			component: MyOrdersView,
+			meta: { requiresAuth: true }
+		},
+		{
 			path: '/produto/:id',
 			name: 'product-detail',
 			component: ProductDetail,
@@ -53,8 +60,9 @@ const router = createRouter({
 	]
 })
 
-router.beforeEach((to) => {
-	const loggedIn = isAuthenticated()
+router.beforeEach(async (to) => {
+	const session = await getCurrentSession()
+	const loggedIn = Boolean(session)
 
 	if (to.meta.requiresAuth && !loggedIn) {
 		return {

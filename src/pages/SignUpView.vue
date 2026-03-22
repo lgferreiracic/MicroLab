@@ -70,9 +70,10 @@
 
 						<button
 							type="submit"
+							:disabled="isSubmitting"
 							class="h-11 w-full rounded-lg bg-brand-primary text-sm font-semibold text-white transition hover:bg-brand-secondary"
 						>
-							Criar conta
+							{{ isSubmitting ? 'Criando conta...' : 'Criar conta' }}
 						</button>
 					</form>
 
@@ -96,7 +97,8 @@ import { defineComponent } from 'vue'
 import { RouterLink } from 'vue-router'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
-import { isAuthenticated, signUp } from '../lib/auth'
+import { getCurrentSession } from '../services/auth.service'
+import { createUserAccount } from '../services/user-creation.service'
 
 export default defineComponent({
 	name: 'SignUpView',
@@ -111,16 +113,18 @@ export default defineComponent({
 			email: '',
 			password: '',
 			confirmPassword: '',
-			errorMessage: ''
+			errorMessage: '',
+			isSubmitting: false
 		}
 	},
-	created() {
-		if (isAuthenticated()) {
-			this.$router.replace({ name: 'perfil' })
+	async created() {
+		const session = await getCurrentSession()
+		if (session) {
+			await this.$router.replace({ name: 'perfil' })
 		}
 	},
 	methods: {
-		handleSignUp(): void {
+		async handleSignUp(): Promise<void> {
 			if (!this.name || !this.email || !this.password || !this.confirmPassword) {
 				this.errorMessage = 'Preencha todos os campos para criar a conta.'
 				return
@@ -132,13 +136,28 @@ export default defineComponent({
 			}
 
 			this.errorMessage = ''
-			signUp({
-				name: this.name,
-				email: this.email
-			})
+			this.isSubmitting = true
 
-			const redirect = typeof this.$route.query.redirect === 'string' ? this.$route.query.redirect : '/perfil'
-			this.$router.push(redirect)
+			try {
+				const result = await createUserAccount({
+					name: this.name,
+					email: this.email,
+					password: this.password
+				})
+
+				if (result.requiresEmailConfirmation) {
+					this.errorMessage = 'Conta criada. Verifique seu e-mail para confirmar o cadastro antes de entrar.'
+					await this.$router.push({ name: 'sign-in' })
+					return
+				}
+
+				const redirect = typeof this.$route.query.redirect === 'string' ? this.$route.query.redirect : '/perfil'
+				await this.$router.push(redirect)
+			} catch (error) {
+				this.errorMessage = error instanceof Error ? error.message : 'Nao foi possivel criar sua conta agora.'
+			} finally {
+				this.isSubmitting = false
+			}
 		}
 	}
 })

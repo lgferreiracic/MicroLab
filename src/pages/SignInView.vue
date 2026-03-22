@@ -48,9 +48,10 @@
 
 						<button
 							type="submit"
+							:disabled="isSubmitting"
 							class="h-11 w-full rounded-lg bg-brand-primary text-sm font-semibold text-white transition hover:bg-brand-secondary"
 						>
-							Entrar
+							{{ isSubmitting ? 'Entrando...' : 'Entrar' }}
 						</button>
 					</form>
 
@@ -74,7 +75,7 @@ import { defineComponent } from 'vue'
 import { RouterLink } from 'vue-router'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
-import { isAuthenticated, signIn } from '../lib/auth'
+import { getCurrentSession, signInWithEmail } from '../services/auth.service'
 
 export default defineComponent({
 	name: 'SignInView',
@@ -87,29 +88,39 @@ export default defineComponent({
 		return {
 			email: '',
 			password: '',
-			errorMessage: ''
+			errorMessage: '',
+			isSubmitting: false
 		}
 	},
-	created() {
-		if (isAuthenticated()) {
-			this.$router.replace({ name: 'perfil' })
+	async created() {
+		const session = await getCurrentSession()
+		if (session) {
+			await this.$router.replace({ name: 'perfil' })
 		}
 	},
 	methods: {
-		handleSignIn(): void {
+		async handleSignIn(): Promise<void> {
 			if (!this.email || !this.password) {
 				this.errorMessage = 'Preencha e-mail e senha para entrar.'
 				return
 			}
 
 			this.errorMessage = ''
-			signIn({
-				name: this.email.split('@')[0] || 'Usuario',
-				email: this.email
-			})
+			this.isSubmitting = true
 
-			const redirect = typeof this.$route.query.redirect === 'string' ? this.$route.query.redirect : '/perfil'
-			this.$router.push(redirect)
+			try {
+				await signInWithEmail({
+					email: this.email,
+					password: this.password
+				})
+
+				const redirect = typeof this.$route.query.redirect === 'string' ? this.$route.query.redirect : '/perfil'
+				await this.$router.push(redirect)
+			} catch (error) {
+				this.errorMessage = error instanceof Error ? error.message : 'Nao foi possivel autenticar no momento.'
+			} finally {
+				this.isSubmitting = false
+			}
 		}
 	}
 })

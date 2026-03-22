@@ -1,34 +1,48 @@
-const AUTH_STORAGE_KEY = 'microlab-auth-user'
+import {
+	getCurrentAuthUser,
+	getCurrentSession,
+	signInWithEmail,
+	signOutUser
+} from '../services/auth.service'
+import { createUserAccount } from '../services/user-creation.service'
 
 export type AuthUser = {
 	name: string
 	email: string
 }
 
-export function getAuthUser(): AuthUser | null {
-	try {
-		const raw = localStorage.getItem(AUTH_STORAGE_KEY)
-		if (!raw) {
-			return null
-		}
-		return JSON.parse(raw) as AuthUser
-	} catch {
+export async function getAuthUser(): Promise<AuthUser | null> {
+	const user = await getCurrentAuthUser()
+	if (!user) {
 		return null
+	}
+
+	return {
+		name: String(user.user_metadata?.name || user.email || 'Usuario'),
+		email: user.email || ''
 	}
 }
 
-export function isAuthenticated(): boolean {
-	return getAuthUser() !== null
+export async function isAuthenticated(): Promise<boolean> {
+	const session = await getCurrentSession()
+	return Boolean(session)
 }
 
-export function signIn(user: AuthUser): void {
-	localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user))
+export async function signIn(user: AuthUser & { password: string }): Promise<void> {
+	await signInWithEmail({
+		email: user.email,
+		password: user.password
+	})
 }
 
-export function signUp(user: AuthUser): void {
-	localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user))
+export async function signUp(user: AuthUser & { password: string }): Promise<void> {
+	await createUserAccount({
+		name: user.name,
+		email: user.email,
+		password: user.password
+	})
 }
 
-export function signOut(): void {
-	localStorage.removeItem(AUTH_STORAGE_KEY)
+export async function signOut(): Promise<void> {
+	await signOutUser()
 }
