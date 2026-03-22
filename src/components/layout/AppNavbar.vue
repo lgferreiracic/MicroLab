@@ -1,96 +1,119 @@
 <template>
   <div class="relative">
-    <nav class="h-28 border-b border-brand-tertiary/40 bg-brand-primary text-white">
-      <div class="mx-auto flex h-full w-full max-w-7xl px-6 sm:px-10 lg:px-12">
-      <div class="flex h-full w-1/5 items-center justify-center border-r border-white/20 px-2">
-        <slot name="logo">
-          <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
-        </slot>
-      </div>
+    <nav class="border-b border-brand-tertiary/40 bg-brand-primary text-white">
+      <div class="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 md:h-28 md:flex-row md:gap-0 md:px-10 md:py-0 lg:px-12">
+        <div class="flex h-12 w-full items-center justify-center border-b border-white/20 pb-2 md:h-full md:w-1/5 md:border-b-0 md:border-r md:px-2 md:pb-0">
+          <slot name="logo">
+            <img :src="logoSrc" :alt="logoText" class="h-12 w-auto object-contain" />
+          </slot>
+        </div>
 
-      <div class="flex h-full w-[55%] items-start justify-center px-4 pt-2">
-        <div class="flex h-full w-full max-w-2xl flex-col">
-          <div class="h-1/2 w-full">
-            <IconField class="h-full w-full">
-              <InputText
-                v-model="searchTerm"
-                :placeholder="searchPlaceholder"
-                class="h-full w-full"
-                @keyup.enter="handleSearch"
-              />
-              <InputIcon class="pi pi-search text-slate-400" />
-            </IconField>
-          </div>
-
-          <div class="mt-2 flex items-stretch gap-2">
-            <button
-              type="button"
-              class="inline-flex w-64 items-stretch gap-2 rounded-md px-2 py-1.5 text-left text-xs leading-tight text-white transition-colors duration-200 hover:bg-brand-tertiary"
-              @click="toggleZipPopover"
-            >
-              <span class="flex min-h-full items-center justify-center px-1">
-                <i class="pi pi-map-marker text-[2.3rem] leading-none"></i>
-              </span>
-              <span>
-                Enviar para:<br />
-                {{ deliveryZip }}, {{ deliveryCity }}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-brand-tertiary"
-              @click="toggleCategoriesPopover"
-            >
-              <i class="pi pi-bars text-base"></i>
-              <span>Categorias</span>
-            </button>
-          </div>
-
-          <Popover
-            ref="zipPopover"
-            :pt="{ content: { class: 'bg-brand-primary text-white border border-brand-tertiary/40 rounded-md' } }"
-          >
-            <div class="flex w-64 flex-col gap-3 p-1">
-              <p class="m-0 text-sm font-medium text-white">Digite seu CEP</p>
-              <InputMask
-                v-model="editableZip"
-                mask="99999-999"
-                placeholder="00000-000"
-                class="w-full"
-                @keyup.enter="applyZip"
-              />
-              <Button label="Atualizar" size="small" severity="secondary" :loading="isUpdatingZip" @click="applyZip" />
+        <div class="flex w-full items-start justify-center md:h-full md:w-[55%] md:px-4 md:pt-2">
+          <div class="flex w-full max-w-2xl flex-col md:h-full">
+            <div class="h-11 w-full md:h-1/2">
+              <IconField class="h-full w-full">
+                <InputText
+                  v-model="searchTerm"
+                  :placeholder="searchPlaceholder"
+                  class="h-full w-full"
+                  @keyup.enter="handleSearch"
+                />
+                <InputIcon class="pi pi-search text-slate-400" />
+              </IconField>
             </div>
-          </Popover>
 
+            <div class="mt-2 flex items-stretch gap-2">
+              <button
+                type="button"
+                class="inline-flex min-w-0 flex-1 items-stretch gap-2 rounded-md px-2 py-1.5 text-left text-xs leading-tight text-white transition-colors duration-200 hover:bg-brand-tertiary md:w-64 md:flex-none"
+                @click="toggleZipPopover"
+              >
+                <span class="flex min-h-full items-center justify-center px-1">
+                  <i class="pi pi-map-marker text-[2.3rem] leading-none"></i>
+                </span>
+                <span>
+                  <span class="md:hidden">Enviar para:<br />{{ deliveryCity }}</span>
+                  <span class="hidden md:inline">Enviar para:<br />{{ deliveryZip }}, {{ deliveryCity }}</span>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-brand-tertiary"
+                @click="toggleCategoriesPopover"
+              >
+                <i class="pi pi-bars text-base"></i>
+                <span>Categorias</span>
+              </button>
+
+              <div class="ml-auto flex items-center gap-1 md:hidden">
+                <Button
+                  icon="pi pi-heart"
+                  aria-label="Favoritos"
+                  text
+                  class="h-9 w-9 text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+                  @click="handleFavorites"
+                />
+                <Button
+                  icon="pi pi-user"
+                  aria-label="Entrar"
+                  text
+                  class="h-9 w-9 text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+                  @click="handleLogin"
+                />
+                <Button
+                  icon="pi pi-shopping-cart"
+                  aria-label="Carrinho"
+                  text
+                  class="h-9 w-9 text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+                  @click="handleCart"
+                />
+              </div>
+            </div>
+
+            <Popover
+              ref="zipPopover"
+              :pt="{ content: { class: 'bg-brand-primary text-white border border-brand-tertiary/40 rounded-md' } }"
+            >
+              <div class="flex w-64 flex-col gap-3 p-1">
+                <p class="m-0 text-sm font-medium text-white">Digite seu CEP</p>
+                <InputMask
+                  v-model="editableZip"
+                  mask="99999-999"
+                  placeholder="00000-000"
+                  class="w-full"
+                  @keyup.enter="applyZip"
+                />
+                <Button label="Atualizar" size="small" severity="secondary" :loading="isUpdatingZip" @click="applyZip" />
+              </div>
+            </Popover>
+          </div>
+        </div>
+
+        <div class="hidden h-full w-1/4 items-start justify-end gap-2 px-3 pt-2 md:flex">
+          <Button
+            label="Favoritos"
+            icon="pi pi-heart"
+            text
+            class="whitespace-nowrap text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+            @click="handleFavorites"
+          />
+          <Button
+            label="Entrar"
+            icon="pi pi-user"
+            text
+            class="whitespace-nowrap text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+            @click="handleLogin"
+          />
+          <Button
+            icon="pi pi-shopping-cart"
+            aria-label="Carrinho"
+            text
+            class="h-10 w-10 text-white! hover:bg-brand-tertiary! hover:text-white! transition-colors duration-200"
+            @click="handleCart"
+          />
         </div>
       </div>
-
-      <div class="flex h-full w-1/4 items-start justify-end gap-2 px-3 pt-2">
-        <Button
-          label="Favoritos"
-          icon="pi pi-heart"
-          text
-          class="whitespace-nowrap !text-white hover:!bg-brand-tertiary hover:!text-white transition-colors duration-200"
-          @click="handleFavorites"
-        />
-        <Button
-          label="Entrar"
-          icon="pi pi-user"
-          text
-          class="whitespace-nowrap !text-white hover:!bg-brand-tertiary hover:!text-white transition-colors duration-200"
-          @click="handleLogin"
-        />
-        <Button
-          icon="pi pi-shopping-cart"
-          aria-label="Carrinho"
-          text
-          class="h-10 w-10 !text-white hover:!bg-brand-tertiary hover:!text-white transition-colors duration-200"
-          @click="handleCart"
-        />
-      </div>
-    </div>
     </nav>
 
     <div v-if="isCategoriesOpen" class="absolute inset-x-0 top-full z-50 mt-2 px-6 sm:px-10 lg:px-12">
