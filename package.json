@@ -21,9 +21,11 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
+    "@supabase/supabase-js": "^2.99.3",
     "@vitejs/plugin-vue": "^6.0.5",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
+    "tslib": "^2.8.1",
     "vite": "^8.0.0",
     "vue": "^3.5.30"
   }
