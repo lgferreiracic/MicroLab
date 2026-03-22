@@ -25,6 +25,7 @@ import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppBanner from '../components/layout/AppBanner.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
 import ProductSection from '../components/product/ProductSection.vue'
+import { isAuthenticated } from '../lib/auth'
 
 export default defineComponent({
 	name: 'HomeView',
@@ -40,12 +41,27 @@ export default defineComponent({
 			console.log('search', searchTerm)
 		},
 		onFavorites(): void {
+			if (!isAuthenticated()) {
+				this.$router.push({ name: 'sign-in', query: { redirect: '/perfil?tab=favorites' } })
+				return
+			}
+
 			this.$router.push({ name: 'perfil', query: { tab: 'favorites' } })
 		},
 		onLogin(): void {
-			this.$router.push({ name: 'perfil' })
+			if (isAuthenticated()) {
+				this.$router.push({ name: 'perfil' })
+				return
+			}
+
+			this.$router.push({ name: 'sign-in' })
 		},
 		onCart(): void {
+			if (!isAuthenticated()) {
+				this.$router.push({ name: 'sign-in', query: { redirect: '/cart' } })
+				return
+			}
+
 			this.$router.push({ name: 'cart' })
 		}
 	}

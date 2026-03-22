@@ -1,5 +1,5 @@
 <template>
-  <section class="mx-auto w-full max-w-[110rem] px-4 py-8 sm:px-6 lg:px-12">
+  <section class="mx-auto w-full max-w-440 px-4 py-8 sm:px-6 lg:px-12">
     <div class="mt-5 space-y-8">
       <div
         v-for="section in sections"

@@ -1,11 +1,7 @@
-export interface CategoryProps {
-  id: number;
-  name: string;
-}
+import type { Product } from './product.model'
 
-export class Category implements CategoryProps {
-  constructor(
-    public id: number,
-    public name: string,
-  ) {}
+export interface Category {
+	category_id: number
+	name: string
+	products?: Product[]
 }

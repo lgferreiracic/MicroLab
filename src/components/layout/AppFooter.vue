@@ -1,6 +1,6 @@
 <template>
 	<footer class="mt-10 border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-		<div class="mx-auto w-full max-w-[110rem] px-4 py-10 sm:px-6 lg:px-12">
+		<div class="mx-auto w-full max-w-440 px-4 py-10 sm:px-6 lg:px-12">
 			<div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.2fr_1fr_1fr_1.2fr]">
 				<div>
 					<h3 class="m-0 text-2xl font-semibold text-brand-primary">MicroLab</h3>
