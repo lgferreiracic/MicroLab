@@ -155,14 +155,21 @@
 								</h3>
 
 								<div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+									<input
+										v-model="addressForm.zip_code"
+										type="text"
+										placeholder="CEP"
+										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:col-span-2"
+										@input="handleZipCodeInput"
+										@blur="lookupAddressByZip(true)"
+										@keyup.enter="lookupAddressByZip(true)"
+									/>
 									<input v-model="addressForm.street" type="text" placeholder="Rua" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 									<input v-model="addressForm.number" type="text" placeholder="Numero" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 									<input v-model="addressForm.complement" type="text" placeholder="Complemento" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 									<input v-model="addressForm.neighborhood" type="text" placeholder="Bairro" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 									<input v-model="addressForm.city" type="text" placeholder="Cidade" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 									<input v-model="addressForm.state" type="text" placeholder="Estado" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.zip_code" type="text" placeholder="CEP" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.country" type="text" placeholder="Pais" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
 								</div>
 
 								<div class="mt-3 flex gap-2">
@@ -237,7 +244,9 @@ export default defineComponent({
 			confirmNewPassword: '',
 			isPasswordValidated: false,
 			isUpdatingPassword: false,
-			passwordMessage: ''
+			passwordMessage: '',
+			isLookingUpZip: false,
+			lastZipLookup: ''
 		}
 	},
 	async created() {
@@ -265,6 +274,7 @@ export default defineComponent({
 				country: 'Brasil'
 			}
 			this.editingAddressId = null
+			this.lastZipLookup = ''
 		},
 		openCreateAddress(): void {
 			this.addressMessage = ''
@@ -284,6 +294,7 @@ export default defineComponent({
 				zip_code: address.zip_code,
 				country: address.country
 			}
+			this.lastZipLookup = address.zip_code.replace(/\D/g, '')
 			this.isAddressFormOpen = true
 		},
 		cancelAddressForm(): void {
@@ -388,6 +399,56 @@ export default defineComponent({
 			this.resetAddressForm()
 			await this.loadAddresses()
 			this.isSavingAddress = false
+		},
+		handleZipCodeInput(): void {
+			const normalizedZip = this.addressForm.zip_code.replace(/\D/g, '')
+			if (normalizedZip.length === 8) {
+				void this.lookupAddressByZip()
+			}
+		},
+		async lookupAddressByZip(force = false): Promise<void> {
+			const normalizedZip = this.addressForm.zip_code.replace(/\D/g, '')
+			if (normalizedZip.length !== 8) {
+				return
+			}
+
+			if (!force && this.lastZipLookup === normalizedZip) {
+				return
+			}
+
+			this.isLookingUpZip = true
+
+			try {
+				const response = await fetch(`https://viacep.com.br/ws/${normalizedZip}/json/`)
+				if (!response.ok) {
+					throw new Error('Falha ao consultar CEP.')
+				}
+
+				const data = await response.json() as {
+					erro?: boolean
+					logradouro?: string
+					bairro?: string
+					localidade?: string
+					uf?: string
+					cep?: string
+				}
+
+				if (data.erro) {
+					throw new Error('CEP nao encontrado.')
+				}
+
+				this.addressForm.zip_code = data.cep || this.addressForm.zip_code
+				this.addressForm.street = data.logradouro || this.addressForm.street
+				this.addressForm.neighborhood = data.bairro || this.addressForm.neighborhood
+				this.addressForm.city = data.localidade || this.addressForm.city
+				this.addressForm.state = data.uf || this.addressForm.state
+				this.lastZipLookup = normalizedZip
+				this.addressMessage = 'Endereco preenchido automaticamente pelo CEP.'
+			} catch (error) {
+				this.addressMessage = error instanceof Error ? error.message : 'Nao foi possivel consultar o CEP.'
+			} finally {
+				this.isLookingUpZip = false
+			}
 		},
 		async goToOrders(): Promise<void> {
 			await this.$router.push({ name: 'my-orders' })

@@ -26,7 +26,8 @@ const router = createRouter({
 		{
 			path: '/checkout',
 			name: 'checkout',
-			component: CheckOut
+			component: CheckOut,
+			meta: { requiresAuth: true }
 		},
 		{
 			path: '/sign-in',
