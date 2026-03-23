@@ -10,7 +10,8 @@ import SearchView from '../pages/SearchView.vue'
 import AdminView from '../pages/AdminView.vue'
 import SignInView from '../pages/SignInView.vue'
 import SignUpView from '../pages/SignUpView.vue'
-import { getCurrentSession } from '../services/auth.service'
+import { supabase } from '../lib/supabase'
+import { getCurrentAuthUser, getCurrentSession } from '../services/auth.service'
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -23,7 +24,8 @@ const router = createRouter({
 		{
 			path: '/cart',
 			name: 'cart',
-			component: CartView
+			component: CartView,
+			meta: { requiresAuth: true }
 		},
 		{
 			path: '/checkout',
@@ -70,7 +72,7 @@ const router = createRouter({
 			path: '/admin',
 			name: 'admin',
 			component: AdminView,
-			meta: { requiresAuth: true }
+			meta: { requiresAuth: true, requiresAdmin: true }
 		},
 		{
 			path: '/produto/:id',
@@ -80,6 +82,34 @@ const router = createRouter({
 		}
 	]
 })
+
+async function isCurrentUserAdmin(): Promise<boolean> {
+	const authUser = await getCurrentAuthUser()
+	if (!authUser) {
+		return false
+	}
+
+	const byAuthUid = await supabase
+		.from('users')
+		.select('role:role_id(name)')
+		.eq('auth_uid', authUser.id)
+		.maybeSingle()
+
+	let roleData = byAuthUid.data?.role as any
+
+	if (!roleData && authUser.email) {
+		const byEmail = await supabase
+			.from('users')
+			.select('role:role_id(name)')
+			.eq('email', authUser.email)
+			.maybeSingle()
+
+		roleData = byEmail.data?.role as any
+	}
+
+	const role = Array.isArray(roleData) ? roleData[0] : roleData
+	return String(role?.name || '').toUpperCase() === 'ADMIN'
+}
 
 router.beforeEach(async (to) => {
 	const session = await getCurrentSession()
@@ -96,6 +126,22 @@ router.beforeEach(async (to) => {
 
 	if (to.meta.requiresGuest && loggedIn) {
 		return { name: 'perfil' }
+	}
+
+	if (to.meta.requiresAdmin) {
+		if (!loggedIn) {
+			return {
+				name: 'sign-in',
+				query: {
+					redirect: to.fullPath
+				}
+			}
+		}
+
+		const admin = await isCurrentUserAdmin()
+		if (!admin) {
+			return { name: 'home' }
+		}
 	}
 
 	return true

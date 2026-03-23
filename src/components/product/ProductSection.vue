@@ -18,7 +18,7 @@
         :key="section.id"
         class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 dark:border-slate-700 dark:bg-slate-900"
       >
-        <h3 class="m-0 mb-3 text-lg font-semibold text-slate-800 dark:text-slate-100">{{ section.title }}</h3>
+        <h3 class="m-0 mb-4 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-extrabold uppercase tracking-wide text-brand-primary dark:bg-brand-secondary/20 dark:text-brand-secondary">{{ section.title }}</h3>
 
         <div class="lg:hidden">
           <Carousel
@@ -68,6 +68,7 @@ import { defineComponent } from 'vue'
 import Carousel from 'primevue/carousel'
 import ProductCard from './ProductCard.vue'
 import arduinoProduct from '../../assets/products/arduino.png'
+import impressora3dProduct from '../../assets/products/impressora3d.avif'
 import raspberryProduct from '../../assets/products/raspberry.png'
 import { getCatalogProducts, type ProductCatalogItem } from '../../services/product.service'
 
@@ -166,6 +167,10 @@ export default defineComponent({
 
       if (normalized.includes('arduino')) {
         return arduinoProduct
+      }
+
+      if (normalized.includes('impressora') || normalized.includes('3d')) {
+        return impressora3dProduct
       }
 
       if (normalized.includes('raspberry')) {

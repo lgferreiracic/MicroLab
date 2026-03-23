@@ -10,14 +10,18 @@
 			class="app-banner-carousel w-full"
 		>
 			<template #item="slotProps">
-				<div class="h-56 w-full sm:h-80 lg:h-135">
+				<button
+					type="button"
+					class="h-56 w-full cursor-pointer sm:h-80 lg:h-135"
+					@click="handleBannerClick(slotProps.data.category)"
+				>
 					<img
 						:src="slotProps.data.image"
 						:alt="slotProps.data.alt"
 						class="h-full w-full object-cover"
 						loading="lazy"
 					/>
-				</div>
+				</button>
 			</template>
 		</Carousel>
 	</section>
@@ -38,10 +42,18 @@ export default defineComponent({
 	data() {
 		return {
 			banners: [
-				{ id: 1, image: arduinoBanner, alt: 'Banner Arduino' },
-				{ id: 2, image: crealityBanner, alt: 'Banner Creality' },
-				{ id: 3, image: raspberryBanner, alt: 'Banner Raspberry' }
+				{ id: 1, image: arduinoBanner, alt: 'Banner Arduino', category: 'Arduino' },
+				{ id: 2, image: crealityBanner, alt: 'Banner Creality', category: 'Impressoras 3D' },
+				{ id: 3, image: raspberryBanner, alt: 'Banner Raspberry', category: 'Raspberry' }
 			]
+		}
+	},
+	methods: {
+		handleBannerClick(category: string): void {
+			void this.$router.push({
+				name: 'search',
+				query: { category }
+			})
 		}
 	}
 })
