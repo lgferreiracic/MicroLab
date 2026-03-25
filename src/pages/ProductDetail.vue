@@ -20,158 +20,60 @@
 				</div>
 
 				<template v-else-if="product">
-					<div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
-							<div class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-white">
-								<img
-									v-if="productImage"
-									:src="productImage"
-									:alt="product.name"
-									class="h-full max-h-105 w-full object-contain"
-								/>
-								<div v-else class="flex h-80 items-center justify-center text-sm text-slate-500 dark:text-slate-400">
-									Imagem indisponivel
-								</div>
-							</div>
+					<ProductDetailHero
+						:product="product"
+						:product-image="productImage"
+						:installments="installments"
+						:installment-value="installmentValue"
+						:pix-price="pixPrice"
+						:is-adding-to-cart="isAddingToCart"
+						:cart-message="cartMessage"
+						:is-adding-to-favorites="isAddingToFavorites"
+						:favorite-message="favoriteMessage"
+						@add-cart="addToCart"
+						@add-favorite="addToFavorites"
+					/>
 
-							<div class="rounded-xl border border-slate-200/80 bg-linear-to-b from-white to-slate-50 p-4 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:to-slate-900/70">
-								<div class="flex items-start justify-between gap-3">
-									<p class="m-0 rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-primary w-fit">Produto</p>
-									<div class="flex flex-col items-end gap-2">
-										<p v-if="product.category?.name" class="m-0 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-											Categoria: {{ product.category.name }}
-										</p>
-										<span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-											{{ product.stock > 0 ? 'Em estoque' : 'Indisponivel' }}
-										</span>
-									</div>
-								</div>
+					<ProductDetailBannerIntro
+						v-if="descriptionBanner"
+						:product-name="product.name"
+						:description-banner="descriptionBanner"
+						:text-phrase="textPhrase"
+						:text-introduction="textIntroduction"
+					/>
 
-								<h1 class="m-0 mt-3 text-center text-3xl font-extrabold tracking-tight text-brand-primary drop-shadow-[0_1px_0_rgba(0,0,0,0.05)] dark:text-brand-secondary">{{ product.name }}</h1>
+					<ProductDetailInfoCards v-if="extraEntries.length" title="Mais informacoes" :entries="extraEntries" />
 
-								<div class="mt-6 flex justify-center">
-									<div class="w-full max-w-sm bg-transparent p-0 text-center">
-										<p class="m-0 text-3xl font-bold text-slate-900 dark:text-slate-100">{{ formatPrice(product.price) }}</p>
-										<p class="m-0 mt-2 text-sm text-slate-600 dark:text-slate-300">
-											{{ installments }}x sem juros de {{ formatPrice(installmentValue) }}
-										</p>
-										<p class="m-0 mt-2 text-sm font-semibold text-brand-primary">
-											No pix: {{ formatPrice(pixPrice) }}
-										</p>
-									</div>
-								</div>
+					<ProductDetailSpecTable v-if="specificationEntries.length" :entries="specificationEntries" />
 
-								<p v-if="cartMessage" class="m-0 mt-3 text-center text-sm font-medium text-brand-primary">{{ cartMessage }}</p>
-								<p v-if="favoriteMessage" class="m-0 mt-2 text-center text-sm font-medium text-brand-primary">{{ favoriteMessage }}</p>
+					<ProductDetailDocumentationLinks v-if="documentationEntries.length" :entries="documentationEntries" />
 
-								<div class="mt-4 flex flex-wrap justify-center gap-2">
-									<button
-										type="button"
-										:disabled="isAddingToCart"
-										class="inline-flex h-11 w-fit items-center rounded-lg bg-brand-primary px-6 text-sm font-semibold text-white transition hover:bg-brand-secondary disabled:cursor-not-allowed disabled:opacity-70"
-										@click="addToCart"
-									>
-										{{ isAddingToCart ? 'Adicionando...' : 'Adicionar ao carrinho' }}
-									</button>
-									<button
-										type="button"
-										:disabled="isAddingToFavorites"
-										class="inline-flex h-11 w-fit items-center rounded-lg border border-brand-primary bg-white px-6 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary/10 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-900"
-										@click="addToFavorites"
-									>
-										{{ isAddingToFavorites ? 'Salvando...' : 'Adicionar aos favoritos' }}
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
+					<ProductDetailComesWith v-if="comesWithEntries.length" :entries="comesWithEntries" />
 
-					<div v-if="descriptionBanner" class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-						<img :src="descriptionBanner" :alt="`${product.name} banner`" class="w-full object-cover" />
-						<div v-if="textPhrase || textIntroduction" class="border-t border-slate-200 px-5 py-4 dark:border-slate-700">
-							<p v-if="textPhrase" class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">{{ textPhrase }}</p>
-							<p v-if="textIntroduction" class="m-0 mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{{ textIntroduction }}</p>
-						</div>
-					</div>
+					<ProductDetailImageBlock
+						v-if="hasPinout"
+						title="Pinout"
+						:introduction="pinoutIntroduction"
+						:image-url="pinoutImage"
+						image-alt="Pinout"
+						image-class="mt-4 mx-auto w-full rounded-lg border border-slate-200 object-contain dark:border-slate-700"
+					/>
 
-					<div v-if="extraEntries.length" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Mais informacoes</h2>
-						<div class="mt-4 space-y-3">
-							<div v-for="entry in extraEntries" :key="entry.key" class="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-								<p class="m-0 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ entry.key }}</p>
-								<p class="m-0 mt-1 text-sm text-slate-600 dark:text-slate-300">{{ entry.value }}</p>
-							</div>
-						</div>
-					</div>
+					<ProductDetailImageBlock
+						v-if="hasDimensions"
+						title="Dimensoes"
+						:introduction="dimensionsIntroduction"
+						:image-url="dimensionsImage"
+						image-alt="Dimensoes"
+						image-class="mt-4 max-h-105 w-full rounded-lg border border-slate-200 object-contain dark:border-slate-700"
+					/>
 
-					<div v-if="specificationEntries.length" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Especificacoes</h2>
-						<div class="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-							<div v-for="entry in specificationEntries" :key="entry.key" class="grid grid-cols-1 gap-2 border-b border-slate-200 p-3 last:border-b-0 sm:grid-cols-[220px_1fr] dark:border-slate-700">
-								<p class="m-0 text-sm font-medium text-slate-800 dark:text-slate-100">{{ entry.key }}</p>
-								<p class="m-0 text-sm text-slate-600 dark:text-slate-300">{{ entry.value }}</p>
-							</div>
-						</div>
-					</div>
-
-					<div v-if="documentationEntries.length" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Documentacao</h2>
-						<div class="mt-4 space-y-2">
-							<a
-								v-for="entry in documentationEntries"
-								:key="entry.key"
-								:href="entry.value"
-								target="_blank"
-								rel="noreferrer noopener"
-								class="block rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-brand-primary no-underline transition hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800/60"
-							>
-								{{ entry.key }}
-							</a>
-						</div>
-					</div>
-
-					<div v-if="comesWithEntries.length" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">O que acompanha</h2>
-						<div class="mt-4 space-y-2">
-							<div v-for="entry in comesWithEntries" :key="entry.key" class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800/60">
-								<span class="font-medium text-slate-800 dark:text-slate-100">{{ entry.key }}</span>
-								<span class="text-slate-600 dark:text-slate-300">{{ entry.value }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div v-if="hasPinout" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Pinout</h2>
-						<p v-if="pinoutIntroduction" class="m-0 mt-3 text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">{{ pinoutIntroduction }}</p>
-						<img v-if="pinoutImage" :src="pinoutImage" alt="Pinout" class="mt-4 mx-auto w-full rounded-lg border border-slate-200 object-contain dark:border-slate-700" />
-					</div>
-
-					<div v-if="hasDimensions" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Dimensoes</h2>
-						<p v-if="dimensionsIntroduction" class="m-0 mt-3 text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">{{ dimensionsIntroduction }}</p>
-						<img v-if="dimensionsImage" :src="dimensionsImage" alt="Dimensoes" class="mt-4 max-h-105 w-full rounded-lg border border-slate-200 object-contain dark:border-slate-700" />
-					</div>
-
-					<div v-if="hasVideo" class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary">Video</h2>
-						<p v-if="videoIntroduction" class="m-0 mt-3 text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">{{ videoIntroduction }}</p>
-						<div v-if="videoEmbedLink" class="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-							<div class="aspect-video">
-								<iframe
-									class="h-full w-full"
-									:src="videoEmbedLink"
-									title="Video do produto"
-									loading="lazy"
-									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-									allowfullscreen
-								></iframe>
-							</div>
-						</div>
-						<p v-else-if="videoLink" class="m-0 mt-3 text-sm text-slate-600 dark:text-slate-300">
-							Preview nao disponivel para este link. Abra em nova aba:
-							<a :href="videoLink" target="_blank" rel="noreferrer noopener" class="font-semibold text-brand-primary">{{ videoLink }}</a>
-						</p>
-					</div>
+					<ProductDetailVideoBlock
+						v-if="hasVideo"
+						:video-introduction="videoIntroduction"
+						:video-link="videoLink"
+						:video-embed-link="videoEmbedLink"
+					/>
 				</template>
 			</div>
 		</section>
@@ -185,6 +87,14 @@ import { defineComponent } from 'vue'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
+import ProductDetailHero from '../components/product-detail/ProductDetailHero.vue'
+import ProductDetailBannerIntro from '../components/product-detail/ProductDetailBannerIntro.vue'
+import ProductDetailInfoCards from '../components/product-detail/ProductDetailInfoCards.vue'
+import ProductDetailSpecTable from '../components/product-detail/ProductDetailSpecTable.vue'
+import ProductDetailDocumentationLinks from '../components/product-detail/ProductDetailDocumentationLinks.vue'
+import ProductDetailComesWith from '../components/product-detail/ProductDetailComesWith.vue'
+import ProductDetailImageBlock from '../components/product-detail/ProductDetailImageBlock.vue'
+import ProductDetailVideoBlock from '../components/product-detail/ProductDetailVideoBlock.vue'
 import { supabase } from '../lib/supabase'
 import { getCurrentSession } from '../services/auth.service'
 import { addFavoriteItem } from '../services/favorite.service'
@@ -214,7 +124,15 @@ export default defineComponent({
 	components: {
 		AppHeader,
 		AppNavbar,
-		AppFooter
+		AppFooter,
+		ProductDetailHero,
+		ProductDetailBannerIntro,
+		ProductDetailInfoCards,
+		ProductDetailSpecTable,
+		ProductDetailDocumentationLinks,
+		ProductDetailComesWith,
+		ProductDetailImageBlock,
+		ProductDetailVideoBlock
 	},
 	props: {
 		id: {
@@ -393,12 +311,6 @@ export default defineComponent({
 			return Object.entries(record)
 				.filter((entry) => typeof entry[1] === 'string' && String(entry[1]).trim().length > 0)
 				.map((entry) => ({ key: entry[0], value: String(entry[1]) }))
-		},
-		formatPrice(price: number): string {
-			return new Intl.NumberFormat('pt-BR', {
-				style: 'currency',
-				currency: 'BRL'
-			}).format(price)
 		},
 		async loadProduct(): Promise<void> {
 			this.isLoading = true
