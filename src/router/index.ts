@@ -1,15 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../pages/HomeView.vue'
-import CartView from '../pages/CartView.vue'
-import CheckOut from '../pages/CheckOut.vue'
-import PerfilView from '../pages/PerfilView.vue'
-import MyOrdersView from '../pages/MyOrdersView.vue'
-import ProductDetail from '../pages/ProductDetail.vue'
-import FavoriteView from '../pages/FavoriteView.vue'
-import SearchView from '../pages/SearchView.vue'
-import AdminView from '../pages/AdminView.vue'
-import SignInView from '../pages/SignInView.vue'
-import SignUpView from '../pages/SignUpView.vue'
 import { supabase } from '../lib/supabase'
 import { getCurrentAuthUser, getCurrentSession } from '../services/auth.service'
 
@@ -19,65 +8,65 @@ const router = createRouter({
 		{
 			path: '/',
 			name: 'home',
-			component: HomeView
+			component: () => import('../pages/HomeView.vue')
 		},
 		{
 			path: '/cart',
 			name: 'cart',
-			component: CartView,
+			component: () => import('../pages/CartView.vue'),
 			meta: { requiresAuth: true }
 		},
 		{
 			path: '/checkout',
 			name: 'checkout',
-			component: CheckOut,
+			component: () => import('../pages/CheckOut.vue'),
 			meta: { requiresAuth: true }
 		},
 		{
 			path: '/sign-in',
 			name: 'sign-in',
-			component: SignInView,
+			component: () => import('../pages/SignInView.vue'),
 			meta: { requiresGuest: true }
 		},
 		{
 			path: '/sign-up',
 			name: 'sign-up',
-			component: SignUpView,
+			component: () => import('../pages/SignUpView.vue'),
 			meta: { requiresGuest: true }
 		},
 		{
 			path: '/perfil',
 			name: 'perfil',
-			component: PerfilView,
+			component: () => import('../pages/PerfilView.vue'),
 			meta: { requiresAuth: true }
 		},
 		{
 			path: '/meus-pedidos',
 			name: 'my-orders',
-			component: MyOrdersView,
+			component: () => import('../pages/MyOrdersView.vue'),
 			meta: { requiresAuth: true }
 		},
 		{
 			path: '/favoritos',
 			name: 'favorites',
-			component: FavoriteView,
+			component: () => import('../pages/FavoriteView.vue'),
 			meta: { requiresAuth: true }
 		},
 		{
 			path: '/busca',
 			name: 'search',
-			component: SearchView
+			component: () => import('../pages/SearchView.vue')
 		},
 		{
 			path: '/admin',
 			name: 'admin',
-			component: AdminView,
+			component: () => import('../pages/AdminView.vue'),
 			meta: { requiresAuth: true, requiresAdmin: true }
 		},
 		{
 			path: '/produto/:id',
 			name: 'product-detail',
-			component: ProductDetail,
+			component: () => import('../pages/ProductDetail.vue'),
 			props: true
 		}
 	]

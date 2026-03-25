@@ -2,7 +2,7 @@
   <div class="relative">
     <nav
       class="border-b border-brand-tertiary/40 bg-brand-primary text-white shadow-sm"
-      :class="isCompact ? 'fixed inset-x-0 top-0 z-[70]' : 'sticky top-0 z-[60]'"
+      :class="isCompact ? 'fixed inset-x-0 top-0 z-70' : 'sticky top-0 z-60'"
     >
       <div v-if="isCompact" class="mx-auto flex h-20 w-full max-w-7xl items-center gap-3 px-4 sm:px-6 md:px-10 lg:px-12">
         <div class="flex items-center justify-center">
