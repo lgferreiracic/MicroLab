@@ -11,177 +11,45 @@
 
 		<section class="px-4 py-8 sm:px-6 lg:px-12">
 			<div class="mx-auto w-full max-w-7xl space-y-6">
-				<div class="relative overflow-hidden rounded-2xl bg-linear-to-r from-brand-primary via-brand-secondary to-brand-tertiary p-6 text-white shadow-lg sm:p-8">
-					<div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10"></div>
-					<div class="pointer-events-none absolute -bottom-16 right-12 h-32 w-32 rounded-full bg-white/10"></div>
+				<ProfileHeroBanner :display-name="displayName" :display-email="displayEmail" :member-since="memberSince" />
 
-					<p class="m-0 text-xs font-semibold uppercase tracking-[0.2em] text-white/85">Area do cliente</p>
-					<h1 class="m-0 mt-2 text-2xl font-semibold sm:text-3xl">{{ displayName }}</h1>
-					<p class="m-0 mt-2 text-sm text-white/90">{{ displayEmail }}</p>
-
-					<div class="mt-5 flex flex-wrap gap-2">
-						<span class="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">Conta ativa</span>
-						<span class="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">Membro desde {{ memberSince }}</span>
-					</div>
-				</div>
-
-				<div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-						<div class="flex items-start justify-between gap-4">
-							<div class="flex-1">
-								<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Dados da conta</h2>
-								<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-									<div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-										<p class="m-0 text-xs text-slate-500 dark:text-slate-400">Nome</p>
-										<p class="m-0 mt-1 text-sm font-medium text-slate-800 dark:text-slate-100">{{ displayName }}</p>
-									</div>
-									<div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-										<p class="m-0 text-xs text-slate-500 dark:text-slate-400">E-mail</p>
-										<p class="m-0 mt-1 text-sm font-medium text-slate-800 dark:text-slate-100">{{ displayEmail }}</p>
-									</div>
-								</div>
-							</div>
-							<button
-								type="button"
-								class="mt-0 h-10 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700"
-								@click="handleSignOut"
-							>
-								Sair
-							</button>
-						</div>
-				</div>
+				<ProfileAccountCard :display-name="displayName" :display-email="displayEmail" @sign-out="handleSignOut" />
 
 				<div class="space-y-6">
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2 auto-rows-fr">
-							<div class="flex flex-col rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-								<div>
-									<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Meus pedidos</h2>
-									<p class="m-0 mt-2 text-sm text-slate-600 dark:text-slate-300">Acompanhe status e historico de compras em uma tela dedicada.</p>
-								</div>
-								<div class="flex-1"></div>
-								<button
-									type="button"
-									class="mt-4 h-10 w-fit rounded-lg bg-brand-primary px-6 text-sm font-semibold text-white transition hover:bg-brand-secondary"
-									@click="goToOrders"
-								>
-									Ver meus pedidos
-								</button>
-							</div>
+							<ProfileOrdersCard @go-orders="goToOrders" />
 
-							<div class="flex flex-col rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-								<div>
-									<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Seguranca</h2>
-									<p class="m-0 mt-2 text-sm text-slate-600 dark:text-slate-300">Altere sua senha da conta.</p>
-
-									<div class="mt-4 space-y-2">
-										<input v-model="currentPassword" type="password" placeholder="Senha atual" class="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-
-										<div v-if="isPasswordValidated" class="space-y-2">
-											<input v-model="newPassword" type="password" placeholder="Nova senha" class="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-											<input v-model="confirmNewPassword" type="password" placeholder="Confirmar nova senha" class="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-										</div>
-									</div>
-
-									<p v-if="passwordMessage" class="m-0 mt-2 text-sm text-brand-primary">{{ passwordMessage }}</p>
-								</div>
-
-								<div class="mt-4 space-y-2">
-									<button
-										type="button"
-										:disabled="isUpdatingPassword || !currentPassword"
-										class="h-10 w-fit rounded-lg px-6 text-sm font-semibold text-white transition"
-										:class="isPasswordValidated ? 'bg-brand-primary hover:bg-brand-secondary' : 'bg-slate-500 hover:bg-slate-600'"
-										@click="isPasswordValidated ? updatePassword : validateCurrentPassword"
-									>
-										{{ isUpdatingPassword ? 'Processando...' : (isPasswordValidated ? 'Alterar senha' : 'Validar senha') }}
-									</button>
-
-									<button
-										v-if="isPasswordValidated"
-										type="button"
-										class="h-10 w-fit rounded-lg bg-slate-200 px-6 text-sm font-semibold text-slate-700 transition hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
-										@click="resetPasswordValidation"
-									>
-										Cancelar
-									</button>
-								</div>
-							</div>
+							<ProfileSecurityCard
+								:current-password="currentPassword"
+								:new-password="newPassword"
+								:confirm-new-password="confirmNewPassword"
+								:is-password-validated="isPasswordValidated"
+								:is-updating-password="isUpdatingPassword"
+								:password-message="passwordMessage"
+								@update:current-password="currentPassword = $event"
+								@update:new-password="newPassword = $event"
+								@update:confirm-new-password="confirmNewPassword = $event"
+								@validate-password="validateCurrentPassword"
+								@update-password="updatePassword"
+								@cancel-password="resetPasswordValidation"
+							/>
 						</div>
 
-					<div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-							<div class="flex items-center justify-between gap-3">
-								<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Meus enderecos</h2>
-								<button
-									type="button"
-									class="h-9 rounded-lg bg-brand-primary px-3 text-sm font-semibold text-white transition hover:bg-brand-secondary"
-									@click="openCreateAddress"
-								>
-									Adicionar endereco
-								</button>
-							</div>
-
-							<p v-if="addressMessage" class="m-0 mt-3 text-sm text-brand-primary">{{ addressMessage }}</p>
-
-							<div class="mt-4 space-y-3">
-								<div
-									v-for="address in addresses"
-									:key="address.address_id"
-									class="rounded-lg border border-slate-200 p-3 dark:border-slate-700"
-								>
-									<div class="flex items-start justify-between gap-3">
-										<div class="text-sm text-slate-700 dark:text-slate-200">
-											<p class="m-0 font-semibold">{{ address.street }}, {{ address.number }}</p>
-											<p class="m-0 mt-1">{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</p>
-											<p class="m-0 mt-1">CEP {{ address.zip_code }} - {{ address.country }}</p>
-											<p v-if="address.complement" class="m-0 mt-1 text-slate-500 dark:text-slate-400">Comp.: {{ address.complement }}</p>
-										</div>
-										<button
-											type="button"
-											class="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
-											@click="openEditAddress(address)"
-										>
-											Editar
-										</button>
-									</div>
-								</div>
-
-								<p v-if="!addresses.length" class="m-0 rounded-lg bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
-									Voce ainda nao cadastrou enderecos.
-								</p>
-							</div>
-
-							<div v-if="isAddressFormOpen" class="mt-4 rounded-lg border border-brand-tertiary/40 bg-slate-50 p-4 dark:border-brand-tertiary/30 dark:bg-slate-800/60">
-								<h3 class="m-0 text-sm font-semibold text-slate-800 dark:text-slate-100">
-									{{ editingAddressId ? 'Editar endereco' : 'Novo endereco' }}
-								</h3>
-
-								<div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-									<input
-										v-model="addressForm.zip_code"
-										type="text"
-										placeholder="CEP"
-										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:col-span-2"
-										@input="handleZipCodeInput"
-										@blur="lookupAddressByZip(true)"
-										@keyup.enter="lookupAddressByZip(true)"
-									/>
-									<input v-model="addressForm.street" type="text" placeholder="Rua" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.number" type="text" placeholder="Numero" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.complement" type="text" placeholder="Complemento" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.neighborhood" type="text" placeholder="Bairro" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.city" type="text" placeholder="Cidade" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-									<input v-model="addressForm.state" type="text" placeholder="Estado" class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
-								</div>
-
-								<div class="mt-3 flex gap-2">
-									<button type="button" :disabled="isSavingAddress" class="h-9 rounded-lg bg-brand-primary px-3 text-sm font-semibold text-white transition hover:bg-brand-secondary" @click="saveAddress">
-										{{ isSavingAddress ? 'Salvando...' : 'Salvar endereco' }}
-									</button>
-									<button type="button" class="h-9 rounded-lg bg-slate-200 px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600" @click="cancelAddressForm">
-										Cancelar
-									</button>
-								</div>
-							</div>
-						</div>
+					<ProfileAddressManager
+						:addresses="addresses"
+						:address-message="addressMessage"
+						:is-address-form-open="isAddressFormOpen"
+						:is-saving-address="isSavingAddress"
+						:editing-address-id="editingAddressId"
+						:address-form="addressForm"
+						@create-address="openCreateAddress"
+						@edit-address="openEditAddress"
+						@save-address="saveAddress"
+						@cancel-address="cancelAddressForm"
+						@update:address-form="addressForm = $event"
+						@zip-input="handleZipCodeInput"
+						@lookup-zip="lookupAddressByZip"
+					/>
 				</div>
 			</div>
 		</section>
@@ -195,6 +63,11 @@ import { defineComponent } from 'vue'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
+import ProfileHeroBanner from '../components/profile/ProfileHeroBanner.vue'
+import ProfileAccountCard from '../components/profile/ProfileAccountCard.vue'
+import ProfileOrdersCard from '../components/profile/ProfileOrdersCard.vue'
+import ProfileSecurityCard from '../components/profile/ProfileSecurityCard.vue'
+import ProfileAddressManager from '../components/profile/ProfileAddressManager.vue'
 import { supabase } from '../lib/supabase'
 import { getCurrentAuthUser, getCurrentSession, signInWithEmail, signOutUser, updateCurrentUserPassword } from '../services/auth.service'
 
@@ -216,7 +89,12 @@ export default defineComponent({
 	components: {
 		AppHeader,
 		AppNavbar,
-		AppFooter
+		AppFooter,
+		ProfileHeroBanner,
+		ProfileAccountCard,
+		ProfileOrdersCard,
+		ProfileSecurityCard,
+		ProfileAddressManager
 	},
 	data() {
 		return {

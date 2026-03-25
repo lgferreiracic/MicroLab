@@ -45,156 +45,35 @@
 
 				<div v-else class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
 					<div class="space-y-6 lg:col-span-2">
-						<div class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-							<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Endereco de entrega</h2>
-							<p class="m-0 mt-2 text-sm text-slate-600 dark:text-slate-300">Selecione o endereco cadastrado para este pedido.</p>
-
-							<div v-if="addresses.length" class="mt-4 space-y-3">
-								<label
-									v-for="address in addresses"
-									:key="address.address_id"
-									class="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition"
-									:class="selectedAddressId === address.address_id ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-200 dark:border-slate-700'"
-								>
-									<input v-model="selectedAddressId" :value="address.address_id" type="radio" class="mt-1" />
-									<div class="text-sm text-slate-700 dark:text-slate-200">
-										<p class="m-0 font-semibold">{{ address.street }}, {{ address.number }}</p>
-										<p class="m-0 mt-1">{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</p>
-										<p class="m-0 mt-1">CEP {{ address.zip_code }}</p>
-										<p v-if="address.complement" class="m-0 mt-1 text-slate-500 dark:text-slate-400">Comp.: {{ address.complement }}</p>
-									</div>
-								</label>
-							</div>
-							<p v-else class="m-0 mt-4 rounded-lg bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
-								Voce nao possui endereco cadastrado. Adicione em Minha conta para continuar.
-							</p>
-						</div>
-
-						<div class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-							<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Pagamento</h2>
-							<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-								<label class="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm" :class="paymentMethod === 'pix' ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-200 dark:border-slate-700'">
-									<input v-model="paymentMethod" type="radio" value="pix" />
-									PIX
-								</label>
-								<label class="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm" :class="paymentMethod === 'card' ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-200 dark:border-slate-700'">
-									<input v-model="paymentMethod" type="radio" value="card" />
-									Cartao
-								</label>
-								<label class="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm" :class="paymentMethod === 'boleto' ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-200 dark:border-slate-700'">
-									<input v-model="paymentMethod" type="radio" value="boleto" />
-									Boleto
-								</label>
-							</div>
-
-							<div v-if="paymentMethod === 'card'" class="mt-4 space-y-3">
-								<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-									<input
-										v-model="cardForm.holderName"
-										type="text"
-										placeholder="Nome impresso no cartao"
-										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:col-span-2"
-									/>
-									<input
-										v-model="cardForm.number"
-										type="text"
-										placeholder="Numero do cartao"
-										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:col-span-2"
-									/>
-									<input
-										v-model="cardForm.expiration"
-										type="text"
-										placeholder="Validade (MM/AA)"
-										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-									/>
-									<input
-										v-model="cardForm.cvv"
-										type="text"
-										placeholder="CVV"
-										class="h-10 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-									/>
-								</div>
-
-								<div>
-									<label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Parcelamento</label>
-									<select
-										v-model.number="selectedInstallments"
-										class="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-									>
-										<option v-for="installment in installmentOptions" :key="installment" :value="installment">
-											{{ installment }}x de {{ formatPrice(cardInstallmentValue) }} sem juros
-										</option>
-									</select>
-								</div>
-							</div>
-
-							<p v-if="paymentMethod === 'pix'" class="m-0 mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-medium text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
-								Desconto PIX aplicado: {{ formatPrice(pixDiscountAmount) }}
-							</p>
-						</div>
-
-						<div class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-							<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Itens do pedido</h2>
-							<div class="mt-4 space-y-3">
-								<div v-for="item in cartItems" :key="item.cart_item_id" class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-									<div class="h-14 w-14 overflow-hidden rounded-md border border-slate-200 bg-white dark:border-slate-700">
-										<img v-if="item.product_image" :src="item.product_image" :alt="item.product_name" class="h-full w-full object-contain p-1" />
-									</div>
-									<div class="min-w-0 flex-1">
-										<p class="m-0 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{{ item.product_name }}</p>
-										<p class="m-0 mt-1 text-xs text-slate-600 dark:text-slate-300">Qtd: {{ item.quantity }}</p>
-									</div>
-									<p class="m-0 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ formatPrice(item.product_price * item.quantity) }}</p>
-								</div>
-							</div>
-						</div>
+						<CheckoutAddressSelector v-model="selectedAddressId" :addresses="addresses" />
+						<CheckoutPaymentMethod
+							:payment-method="paymentMethod"
+							:selected-installments="selectedInstallments"
+							:installment-options="installmentOptions"
+							:card-form="cardForm"
+							:card-installment-value="cardInstallmentValue"
+							:pix-discount-amount="pixDiscountAmount"
+							@update:payment-method="paymentMethod = $event"
+							@update:selected-installments="selectedInstallments = $event"
+							@update:card-form="cardForm = $event"
+						/>
+						<CheckoutOrderItems :cart-items="cartItems" />
 					</div>
-
-					<div class="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-						<h2 class="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">Resumo</h2>
-
-						<div class="mt-4 space-y-3 border-b border-slate-200 pb-4 text-sm dark:border-slate-700">
-							<div class="flex justify-between">
-								<span class="text-slate-600 dark:text-slate-300">Subtotal</span>
-								<span class="font-medium text-slate-800 dark:text-slate-100">{{ formatPrice(subtotal) }}</span>
-							</div>
-							<div class="flex justify-between">
-								<span class="text-slate-600 dark:text-slate-300">Frete</span>
-								<span class="font-medium text-slate-800 dark:text-slate-100">{{ formatPrice(shippingCost) }}</span>
-							</div>
-							<div v-if="paymentMethod === 'pix'" class="flex justify-between">
-								<span class="text-emerald-700 dark:text-emerald-300">Desconto PIX (10%)</span>
-								<span class="font-medium text-emerald-700 dark:text-emerald-300">- {{ formatPrice(pixDiscountAmount) }}</span>
-							</div>
-						</div>
-
-						<div class="mt-4 flex justify-between">
-							<span class="text-lg font-semibold text-slate-800 dark:text-slate-100">Total</span>
-							<span class="text-lg font-bold text-brand-primary">{{ formatPrice(payableTotal) }}</span>
-						</div>
-
-						<p v-if="paymentMethod === 'card'" class="m-0 mt-2 text-xs text-slate-600 dark:text-slate-300">
-							Pagamento em {{ selectedInstallments }}x de {{ formatPrice(cardInstallmentValue) }} sem juros.
-						</p>
-
-						<p v-if="checkoutMessage" class="m-0 mt-4 text-sm text-brand-primary">{{ checkoutMessage }}</p>
-
-						<button
-							type="button"
-							:disabled="isPlacingOrder || !addresses.length || !selectedAddressId"
-							class="mt-6 w-full rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-secondary disabled:cursor-not-allowed disabled:opacity-60"
-							@click="placeOrder"
-						>
-							{{ isPlacingOrder ? 'Finalizando...' : 'Finalizar compra' }}
-						</button>
-						<button
-							type="button"
-							class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
-							@click="goToCart"
-						>
-							Voltar ao carrinho
-						</button>
-					</div>
+					<CheckoutOrderSummary
+						:subtotal="subtotal"
+						:shipping-cost="shippingCost"
+						:pix-discount-amount="pixDiscountAmount"
+						:payable-total="payableTotal"
+						:payment-method="paymentMethod"
+						:selected-installments="selectedInstallments"
+						:card-installment-value="cardInstallmentValue"
+						:checkout-message="checkoutMessage"
+						:is-placing-order="isPlacingOrder"
+						:has-addresses="Boolean(addresses.length)"
+						:selected-address-id="selectedAddressId"
+						@place-order="placeOrder"
+						@back-to-cart="goToCart"
+					/>
 				</div>
 			</div>
 		</section>
@@ -208,6 +87,10 @@ import { defineComponent } from 'vue'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppNavbar from '../components/layout/AppNavbar.vue'
 import AppFooter from '../components/layout/AppFooter.vue'
+import CheckoutAddressSelector from '../components/checkout/CheckoutAddressSelector.vue'
+import CheckoutPaymentMethod from '../components/checkout/CheckoutPaymentMethod.vue'
+import CheckoutOrderItems from '../components/checkout/CheckoutOrderItems.vue'
+import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.vue'
 import { supabase } from '../lib/supabase'
 import { getCurrentAuthUser, getCurrentSession } from '../services/auth.service'
 import { calculateCartTotal, clearCart, getCartItems, type CartItemWithProduct } from '../services/cart.service'
@@ -229,7 +112,11 @@ export default defineComponent({
 	components: {
 		AppHeader,
 		AppNavbar,
-		AppFooter
+		AppFooter,
+		CheckoutAddressSelector,
+		CheckoutPaymentMethod,
+		CheckoutOrderItems,
+		CheckoutOrderSummary
 	},
 	data() {
 		return {
@@ -239,7 +126,7 @@ export default defineComponent({
 			cartItems: [] as CartItemWithProduct[],
 			addresses: [] as AddressRecord[],
 			selectedAddressId: null as number | null,
-			paymentMethod: 'pix',
+			paymentMethod: 'pix' as 'pix' | 'card' | 'boleto',
 			selectedInstallments: 1,
 			cardForm: {
 				holderName: '',
@@ -394,12 +281,6 @@ export default defineComponent({
 			} finally {
 				this.isPlacingOrder = false
 			}
-		},
-		formatPrice(price: number): string {
-			return new Intl.NumberFormat('pt-BR', {
-				style: 'currency',
-				currency: 'BRL'
-			}).format(price)
 		},
 		goToCart(): void {
 			this.$router.push({ name: 'cart' })
