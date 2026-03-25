@@ -5,8 +5,7 @@
 			:key="item.cart_item_id"
 			class="flex gap-4 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
 		>
-			<!-- Imagem do produto -->
-			<div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
+			<div class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
 				<img
 					v-if="item.product_image"
 					:src="item.product_image"
