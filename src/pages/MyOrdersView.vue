@@ -1,6 +1,6 @@
 <template>
 	<div class="min-h-screen bg-slate-50 dark:bg-slate-950">
-		<AppHeader class="hidden md:block" title="Meus pedidos" subtitle="Acompanhe o status das suas compras" />
+		<AppHeader class="hidden md:block" title="Meus pedidos" subtitle="" />
 		<AppNavbar
 			logo-text="MicroLab"
 			@search="onSearch"
