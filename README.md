@@ -16,7 +16,7 @@ Bem-vindo ao projeto de e-commerce de produtos eletrônicos, de prototipagem e t
 - **Frontend:** [Vue 3](https://vuejs.org/), [Vite](https://vitejs.dev/)
 - **Backend as a Service:** [Supabase](https://supabase.com/)
 - **Gerenciamento de estado:** Pinia
-- **Estilização:** CSS3
+- **Estilização:** TailwindCSS
 
 ## 📁 Estrutura de Pastas
 
