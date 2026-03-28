@@ -1,10 +1,5 @@
 # MicroLab - TIC-Hub 12 - Programação Fullstack
 
-
-<div align="center" style="background: #000; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-   <img src="./src/assets/logo.png" alt="Banner do Projeto" width="200"/>
-</div>
-
 Bem-vindo ao projeto de e-commerce de produtos eletrônicos, de prototipagem e tecnologia! Este projeto foi desenvolvido utilizando [Vite](https://vitejs.dev/), [Vue 3](https://vuejs.org/) e [Supabase](https://supabase.com/) para proporcionar uma experiência moderna, rápida e escalável.
 
 ## ✨ Funcionalidades
